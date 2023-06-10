@@ -13,6 +13,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @GetMapping("/tasks/{userId}")
     public List<Task> findByUserId(@PathVariable Long userId);
 
-    @PostMapping("/tasks/{userId}")
-    Task createTask(@PathVariable Long userId, Task task);
+    @PostMapping("/tasks/{userId}/{groupId}/{taskSetId}")
+    Task createTask( @PathVariable Long userId, @PathVariable Long groupId, @PathVariable Long taskSetId, Task task);
 }
