@@ -1,18 +1,20 @@
 package com.example.todo.repository;
+
 import com.example.todo.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    @GetMapping("/tasks/{userId}")
-    public List<Task> findByUserId(@PathVariable Long userId);
+    @Query("SELECT t FROM Task t WHERE t.taskSet.userGroup IN (SELECT g FROM UserGroup g JOIN g.users u WHERE u.id = :userId)")
+    List<Task> findByUserId(@Param("userId") Long userId);
 
-    @PostMapping("/tasks/{userId}/{groupId}/{taskSetId}")
-    Task createTask( @PathVariable Long userId, @PathVariable Long groupId, @PathVariable Long taskSetId, Task task);
+    Task save(Task task);
+
+    // @PostMapping("/tasks/{userId}/{groupId}/{taskSetId}")
+    // Task createTask(@PathVariable Long userId, @PathVariable Long groupId, @PathVariable Long taskSetId, Task task);
 }

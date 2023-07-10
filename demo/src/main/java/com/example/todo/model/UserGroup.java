@@ -9,16 +9,18 @@ import java.util.List;
 @Entity
 @Data
 public class UserGroup {
-        @Id
-        @GeneratedValue
-        private Long id;
-        @OneToMany(fetch = FetchType.LAZY)
-        private List<TaskSet> taskSet;
-        @OneToMany(fetch = FetchType.LAZY)
-        private List<UserGroupPermission> userGroupPermission;
+    @Id
+    @GeneratedValue
+    private Long id;
+    @ManyToMany(mappedBy = "groups")
+    private List<Users> users;
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY)
+    private List<TaskSet> taskSet;
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<UserGroupPermission> userGroupPermission;
 
-        private String name;
-        private boolean is_personal;
-        private Date created_at;
-        private Date updated_at;
+    private String name;
+    private boolean is_personal;
+    private Date created_at;
+    private Date updated_at;
 }
