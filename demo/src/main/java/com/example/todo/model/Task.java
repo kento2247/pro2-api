@@ -19,6 +19,7 @@ public class Task {
     private String title;
     private String body;
     private Date due_date;
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean is_completed;
     private Date created_at;
     private Date updated_at;

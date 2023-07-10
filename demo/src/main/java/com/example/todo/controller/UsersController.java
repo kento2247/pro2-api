@@ -1,5 +1,6 @@
 package com.example.todo.controller;
 
+import com.example.todo.dto.LoginRequest;
 import com.example.todo.jwtUtil.JwtUtil;
 import com.example.todo.model.Users;
 import com.example.todo.repository.UsersRepository;
@@ -34,7 +35,7 @@ public class UsersController {
     }
 
     @PostMapping("users/login")
-    public ResponseEntity<String> login(@RequestBody Users user) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest user) {
         Users existingUser = usersRepository.findByEmail(user.getEmail());
         if (existingUser == null) {
             throw new RuntimeException("User not found");

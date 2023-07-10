@@ -20,6 +20,7 @@ public class UserGroup {
     private List<UserGroupPermission> userGroupPermission;
 
     private String name;
+    @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean is_personal;
     private Date created_at;
     private Date updated_at;
