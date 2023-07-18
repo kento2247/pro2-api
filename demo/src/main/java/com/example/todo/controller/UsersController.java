@@ -1,12 +1,16 @@
 package com.example.todo.controller;
 
 import com.example.todo.dto.LoginRequest;
+import com.example.todo.dto.RegisterRequest;
+import com.example.todo.dto.getUserResponse;
 import com.example.todo.jwtUtil.JwtUtil;
 import com.example.todo.model.Users;
 import com.example.todo.repository.UsersRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 public class UsersController {
@@ -21,19 +25,50 @@ public class UsersController {
         this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping("/users/{userId}")
-    public Users getUser(@PathVariable Long userId) {
-        return usersRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    @GetMapping("users")
+    public getUserResponse getAllUser() {
+        getUserResponse response = new getUserResponse();
+        Users user = usersRepository.findAll().get(0);
+        response.setId(user.getId());
+        response.setNickname(user.getNickname());
+        response.setEmail(user.getEmail());
+        response.setTasks(user.getTasks());
+        return response;
+    }
+
+    @GetMapping("users/self")
+    public getUserResponse getUser(@RequestHeader(value = "Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+        System.out.println(jwtToken);
+        String email = jwtUtil.extractNickname(jwtToken);
+        Users user = usersRepository.findByEmail(email);
+
+        getUserResponse response = new getUserResponse();
+        response.setId(user.getId());
+        response.setNickname(user.getNickname());
+        response.setEmail(user.getEmail());
+        response.setEmail(user.getEmail());
+        response.setTasks(user.getTasks());
+        return response;
     }
 
     @PostMapping("users/register")
-    public ResponseEntity<String> register(@RequestBody Users user) {
-        Users existingUser = usersRepository.findByEmail(user.getEmail());
+    public ResponseEntity<String> register(@RequestBody RegisterRequest userRequest) {
+        Users existingUser = usersRepository.findByEmail(userRequest.getEmail());
         if (existingUser != null) {
             throw new RuntimeException("User already exists");
         }
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        Users user = new Users();
+        user.setNickname(userRequest.getNickname());
+        user.setEmail(userRequest.getEmail());
+        user.setNickname(userRequest.getNickname());
+        String hashedPassword = passwordEncoder.encode(userRequest.getPassword());
         user.setPassword(hashedPassword);
+
+        Date now = new Date();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         usersRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }

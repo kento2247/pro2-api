@@ -7,7 +7,7 @@ import java.util.Date;
 public class JwtUtil {
     private final String SECRET_KEY = "demo";
 
-    public String extractUsername(String token) {
+    public String extractNickname(String token) {
         return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
     }
 
@@ -25,7 +25,7 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
+        final String extractedUsername = extractNickname(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 }

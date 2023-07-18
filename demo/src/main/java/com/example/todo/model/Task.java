@@ -13,7 +13,7 @@ public class Task {
     @GeneratedValue
     private Long id;
 
-    @OneToOne
+    @ManyToOne // Updated
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
     private String title;

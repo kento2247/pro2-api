@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Data
@@ -18,6 +19,14 @@ public class Users {
     private Date created_at;
     private Date updated_at;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    private Task task;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY) // Updated
+    private Set<Task> tasks;
+
+    public void setCreatedAt(Date createdAt) {
+        this.created_at = createdAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updated_at = updatedAt;
+    }
 }

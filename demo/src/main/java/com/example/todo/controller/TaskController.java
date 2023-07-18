@@ -5,13 +5,10 @@ import com.example.todo.model.Users;
 import com.example.todo.repository.TaskRepository;
 import com.example.todo.repository.UsersRepository;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.security.access.vote.AuthenticatedVoter.IS_AUTHENTICATED_FULLY;
 
 @RestController
 public class TaskController {
@@ -42,7 +39,6 @@ public class TaskController {
         return ResponseEntity.ok(taskRepository.save(task));
     }
 
-    @Secured(IS_AUTHENTICATED_FULLY)
     @PutMapping("/tasks/{id}")
     public Task updateTask(@AuthenticationPrincipal Users user, @PathVariable Long id, @RequestBody Task taskDetails) {
         Task task =
