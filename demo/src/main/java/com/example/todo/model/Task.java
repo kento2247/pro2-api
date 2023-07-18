@@ -13,14 +13,17 @@ public class Task {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_set_id")
-    private TaskSet taskSet;
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private Users user;
     private String title;
     private String body;
-    private Date due_date;
+    private int priority;
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean is_completed;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean is_archived_on_completion;
+    private Date due_date;
     private Date created_at;
     private Date updated_at;
 }

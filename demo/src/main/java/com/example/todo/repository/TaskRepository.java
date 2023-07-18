@@ -10,11 +10,9 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    @Query("SELECT t FROM Task t WHERE t.taskSet.userGroup IN (SELECT g FROM UserGroup g JOIN g.users u WHERE u.id = :userId)")
+    @Query("SELECT t FROM Task t WHERE t.user.id = :userId ")
     List<Task> findByUserId(@Param("userId") Long userId);
 
     Task save(Task task);
 
-    // @PostMapping("/tasks/{userId}/{groupId}/{taskSetId}")
-    // Task createTask(@PathVariable Long userId, @PathVariable Long groupId, @PathVariable Long taskSetId, Task task);
 }

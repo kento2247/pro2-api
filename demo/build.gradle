@@ -36,7 +36,7 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.0.1'
     implementation 'javax.activation:activation:1.1.1'
-
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 }
 
 tasks.named('test') {

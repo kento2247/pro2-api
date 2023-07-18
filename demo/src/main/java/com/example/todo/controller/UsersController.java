@@ -28,6 +28,10 @@ public class UsersController {
 
     @PostMapping("users/register")
     public ResponseEntity<String> register(@RequestBody Users user) {
+        Users existingUser = usersRepository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            throw new RuntimeException("User already exists");
+        }
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
         usersRepository.save(user);
@@ -55,8 +59,7 @@ public class UsersController {
         Users userToUpdate = usersRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + userId));
 
-        userToUpdate.setFirst_name(user.getFirst_name());
-        userToUpdate.setLast_name(user.getLast_name());
+        userToUpdate.setNickname(user.getNickname());
         userToUpdate.setEmail(user.getEmail());
         userToUpdate.setPassword(user.getPassword());
 
