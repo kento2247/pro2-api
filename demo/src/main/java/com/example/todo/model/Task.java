@@ -26,4 +26,5 @@ public class Task {
     private Date due_date;
     private Date created_at;
     private Date updated_at;
+
 }
