@@ -129,7 +129,7 @@ public class TaskController {
         task.setArchivedOnCompletion(taskDetails.is_archived_on_completion());
         for (long userId : taskDetails.getShared_users()) {
             Users sharedUser = userRepository.findById(userId).orElse(null);
-            if (sharedUser != null) {
+            if (sharedUser != null && !task.getShared_users().contains(sharedUser)) {
                 task.addSharedUser(sharedUser);
             }
         }
