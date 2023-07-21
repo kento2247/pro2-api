@@ -8,13 +8,12 @@ import com.example.todo.model.Users;
 import com.example.todo.repository.TaskRepository;
 import com.example.todo.repository.UsersRepository;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,9 +35,19 @@ public class TaskController {
         String jwtToken = token.replace("Bearer ", "");
         String email = jwtUtil.extractNickname(jwtToken);
         Users user = userRepository.findByEmail(email);
-        List<Task> tasks = taskRepository.findByUserId(user.getId());
 
-        List<TaskDTO> taskDTOs = tasks.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<Task> ownedTasks = taskRepository.findTasksByUserId(user.getId());
+        System.out.println(ownedTasks.size());
+
+        List<Task> sharedTasks = taskRepository.findSharedTasksByUserId(user.getId());
+
+        Set<Task> tasks = new HashSet<>();
+        tasks.addAll(ownedTasks);
+        tasks.addAll(sharedTasks);
+
+        List<TaskDTO> taskDTOs = tasks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
 
         return taskDTOs;
     }
@@ -50,11 +59,19 @@ public class TaskController {
         taskDTO.setBody(task.getBody());
         taskDTO.setPriority(task.getPriority());
         taskDTO.setDue_date(task.getDue_date());
-        taskDTO.set_completed(task.is_completed());
-        taskDTO.set_archived_on_completion(task.is_archived_on_completion());
+        taskDTO.set_completed(task.isCompleted());
+        taskDTO.set_archived_on_completion(task.isArchivedOnCompletion());
         taskDTO.setCreated_at(task.getCreated_at());
         taskDTO.setUpdated_at(task.getUpdated_at());
-        taskDTO.setShared_users(task.getShared_users().toArray(new Users[0]));
+
+        if (task.getShared_users() != null) {
+            long[] userIds = task.getShared_users().stream()
+                    .mapToLong(Users::getId)
+                    .toArray();
+            taskDTO.setShared_users(userIds);
+        } else {
+            taskDTO.setShared_users(new long[]{});
+        }
         return taskDTO;
     }
 
@@ -65,7 +82,7 @@ public class TaskController {
     }
 
     @PostMapping("/tasks/new")
-    public ResponseEntity<TaskDTO> createTask(
+    public TaskDTO createTask(
             @RequestHeader(value = "Authorization") String token,
             @RequestBody NewTaskRequest taskRequest) {
         String jwtToken = token.replace("Bearer ", "");
@@ -80,33 +97,36 @@ public class TaskController {
         task.setTitle(taskRequest.getTitle());
         task.setBody(taskRequest.getBody());
         task.setPriority(taskRequest.getPriority());
-        task.set_completed(taskRequest.is_completed());
-        task.set_archived_on_completion(taskRequest.is_archived_on_completion());
+        task.setCompleted(taskRequest.is_completed());
+        task.setArchivedOnCompletion(taskRequest.is_archived_on_completion());
         task.setDue_date(taskRequest.getDue_date());
-        task.setShared_users(Arrays.asList(taskRequest.getShared_users()));
+        for (long userId : taskRequest.getShared_users()) {
+            Users sharedUser = userRepository.findById(userId).orElse(null);
+            if (sharedUser != null) {
+                task.addSharedUser(sharedUser);
+            }
+        }
         task.setUser(user);
 
         task.setCreated_at(taskRequest.getCreated_at());
         task.setUpdated_at(taskRequest.getUpdated_at());
 
-        Task savedTask = taskRepository.save(task);
-
-        TaskDTO taskDTO = convertToDTO(savedTask);
-
-        return ResponseEntity.ok(taskDTO);
+        taskRepository.save(task);
+        return convertToDTO(task);
     }
 
     @PutMapping("/tasks/{id}")
     public Task updateTask(
-            @AuthenticationPrincipal Users user, @PathVariable Long id, @RequestBody Task taskDetails) {
+            @PathVariable Long id, @RequestBody TaskDTO taskDetails) {
         Task task =
                 taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
         task.setTitle(taskDetails.getTitle());
         task.setBody(taskDetails.getBody());
         task.setDue_date(taskDetails.getDue_date());
-        task.set_completed(taskDetails.is_completed());
+        task.setCompleted(taskDetails.is_completed());
         task.setPriority(taskDetails.getPriority());
-        task.set_archived_on_completion(taskDetails.is_archived_on_completion());
+        task.setArchivedOnCompletion(taskDetails.is_archived_on_completion());
+        task.setUpdated_at(taskDetails.getUpdated_at());
         return taskRepository.save(task);
     }
 

@@ -1,6 +1,5 @@
 package com.example.todo.dto;
 
-import com.example.todo.model.Users;
 import lombok.Data;
 
 import java.util.Date;
@@ -16,6 +15,6 @@ public class TaskDTO {
     private Date due_date;
     private Date created_at;
     private Date updated_at;
-    private Users[] shared_users;
+    private long[] shared_users;
 }
 

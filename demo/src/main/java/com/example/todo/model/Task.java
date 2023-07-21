@@ -3,6 +3,7 @@ package com.example.todo.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +22,9 @@ public class Task {
     private String body;
     private int priority;
     @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean is_completed;
+    private boolean completed;
     @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean is_archived_on_completion;
+    private boolean archivedOnCompletion;
     private Date due_date;
     private Date created_at;
     private Date updated_at;
@@ -35,4 +36,11 @@ public class Task {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<Users> shared_users;
+
+    public void addSharedUser(Users user) {
+        if (this.shared_users == null) {
+            this.shared_users = new ArrayList<>();
+        }
+        this.shared_users.add(user);
+    }
 }
