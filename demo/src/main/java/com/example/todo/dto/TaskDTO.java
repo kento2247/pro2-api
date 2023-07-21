@@ -6,7 +6,8 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class NewTaskRequest {
+public class TaskDTO {
+    private Long id;
     private String title;
     private String body;
     private int priority;
@@ -17,3 +18,4 @@ public class NewTaskRequest {
     private Date updated_at;
     private Users[] shared_users;
 }
+
