@@ -13,7 +13,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t WHERE t.user.id = :userId ")
     List<Task> findByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT t FROM Task t WHERE t.user.id = :userId AND (t.completed = false OR (t.completed = true AND t.archivedOnCompletion = false))")
+    @Query("SELECT t FROM Task t WHERE t.user.id = :userId AND (t.completed = false OR (t.completed = true AND t.archivedOnCompletion = false)) ORDER BY t.priority DESC")
     List<Task> findTasksByUserId(@Param("userId") Long userId);
 
 

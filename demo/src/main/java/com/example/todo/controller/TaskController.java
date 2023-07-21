@@ -37,8 +37,6 @@ public class TaskController {
         Users user = userRepository.findByEmail(email);
 
         List<Task> ownedTasks = taskRepository.findTasksByUserId(user.getId());
-        System.out.println(ownedTasks.size());
-
         List<Task> sharedTasks = taskRepository.findSharedTasksByUserId(user.getId());
 
         Set<Task> tasks = new HashSet<>();
@@ -126,14 +124,13 @@ public class TaskController {
         task.setCompleted(taskDetails.is_completed());
         task.setPriority(taskDetails.getPriority());
         task.setArchivedOnCompletion(taskDetails.is_archived_on_completion());
+        for (long userId : taskDetails.getShared_users()) {
+            Users sharedUser = userRepository.findById(userId).orElse(null);
+            if (sharedUser != null) {
+                task.addSharedUser(sharedUser);
+            }
+        }
         task.setUpdated_at(taskDetails.getUpdated_at());
         return taskRepository.save(task);
-    }
-
-    @DeleteMapping("/tasks/{id}")
-    public void deleteTask(@PathVariable Long id) {
-        Task task =
-                taskRepository.findById(id).orElseThrow(() -> new RuntimeException("Task not found"));
-        taskRepository.delete(task);
     }
 }
