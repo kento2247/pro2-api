@@ -11,9 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,11 +40,13 @@ public class TaskController {
         List<Task> ownedTasks = taskRepository.findTasksByUserId(user.getId());
         List<Task> sharedTasks = taskRepository.findSharedTasksByUserId(user.getId());
 
-        Set<Task> tasks = new HashSet<>();
-        tasks.addAll(ownedTasks);
-        tasks.addAll(sharedTasks);
+        List<Task> allTasks = new ArrayList<>();
+        allTasks.addAll(ownedTasks);
+        allTasks.addAll(sharedTasks);
 
-        List<TaskDTO> taskDTOs = tasks.stream()
+        // Sort the tasks by priority in descending order
+        Collections.sort(allTasks, Comparator.comparingInt(Task::getPriority).reversed());
+        List<TaskDTO> taskDTOs = allTasks.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
