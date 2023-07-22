@@ -1,10 +1,25 @@
-version: "3"
+version: '3'
 services:
-  postgres:
-    image: "postgres:latest"
-    environment:
-      - "POSTGRES_DB=mydatabase"
-      - "POSTGRES_PASSWORD=secret"
-      - "POSTGRES_USER=myuser"
+  postgres-db:
+    image: postgres:13
+    container_name: postgres-db
     ports:
-      - "5432"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: your-database
+      POSTGRES_USER: your-username
+      POSTGRES_PASSWORD: your-password
+
+  spring-boot-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/your-database
+      - SPRING_DATASOURCE_USERNAME=your-username
+      - SPRING_DATASOURCE_PASSWORD=your-password
+    depends_on:
+      - postgres-db
